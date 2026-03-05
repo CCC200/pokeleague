@@ -1,10 +1,9 @@
 import sqlite3, uuid
 from datetime import datetime
-
-__DB_NAME = '_db/users.db'
+from modules import config
 
 def init():
-    con = sqlite3.connect(__DB_NAME)
+    con = sqlite3.connect(config.DB_NAME)
     cur = con.cursor()
     res = cur.execute("SELECT name FROM sqlite_master WHERE name='users'")
     if res.fetchone() is None:
@@ -13,20 +12,20 @@ def init():
                     CREATE TABLE users(
                     sid varchar(18) PRIMARY KEY,
                     name varchar(30) NOT NULL,
-                    joindate date NOT NULL
+                    joindate datetime NOT NULL
                     )
                     """)
     con.close()
 
 def register(name:str):
-    con = sqlite3.connect(__DB_NAME)
+    con = sqlite3.connect(config.DB_NAME)
     cur = con.cursor()
-    if __exists__(cur, name):
+    if __exists(cur, name):
         print(f'User {name} already exists, aborting register')
         return
     gen = True
     while(gen):
-        sid = __secret__()
+        sid = __secret()
         res = cur.execute(f"SELECT sid FROM users WHERE sid='{sid}'")
         if res.fetchone() is None:
             res = cur.execute(f"INSERT INTO users VALUES(?,?,?)", (sid, name, datetime.now()))
@@ -37,7 +36,7 @@ def register(name:str):
     con.close()
 
 def get(sid:str):
-    con = sqlite3.connect(__DB_NAME)
+    con = sqlite3.connect(config.DB_NAME)
     cur = con.cursor()
     res = cur.execute(f"SELECT * FROM users WHERE sid='{sid}'")
     data = res.fetchone()
@@ -51,11 +50,11 @@ def get(sid:str):
     }
     return u
 
-def __exists__(cur:sqlite3.Cursor, name:str):
+def __exists(cur:sqlite3.Cursor, name:str):
     res = cur.execute(f"SELECT sid FROM users WHERE name='{name}'")
     if res.fetchone() is None:
         return False
     return True
 
-def __secret__():
+def __secret():
     return str(uuid.uuid4()).replace('-', '')[:18]

@@ -1,7 +1,7 @@
 import os, json
 
 # default settings (overriden by settings.json)
-league_name = 'My League'
+DB_NAME = '_db/pokeleague.db'
 address = '0.0.0.0'
 port = 6500
 buffer = 1024
@@ -11,9 +11,6 @@ def init():
     if os.path.exists('_config/settings.json'):
         with open('_config/settings.json', 'r') as file:
             data = json.loads(file.read())
-        if 'league_name' in data:
-            global league_name
-            league_name = data['league_name']
         if 'address' in data:
             global address
             address = data['address']
@@ -23,7 +20,6 @@ def init():
     else:
         print('Creating settings.json...')
         settings = {
-            'league_name': league_name,
             'address': address,
             'port': port,
         }
