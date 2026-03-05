@@ -42,7 +42,7 @@ def get(sid:str):
     res = cur.execute(f"SELECT * FROM users WHERE sid='{sid}'")
     data = res.fetchone()
     if data is None:
-        print(f'User matching {sid} does not exist')
+        print(f"User matching '{sid}' does not exist")
         return
     u = {
         'sid': data[0],
