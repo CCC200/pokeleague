@@ -10,7 +10,7 @@ def init():
         print('Creating leagues database...')
         cur.execute("""
                     CREATE TABLE leagues(
-                    lid int PRIMARY KEY,
+                    lid INTEGER PRIMARY KEY AUTOINCREMENT,
                     name varchar(30) NOT NULL,
                     maxcap int NOT NULL DEFAULT 16,
                     createdate datetime NOT NULL
@@ -35,7 +35,7 @@ def register(name:str, cap:int=16):
     con = sqlite3.connect(config.DB_NAME)
     cur = con.cursor()
     if not __exists(cur, name):
-        res = cur.execute("INSERT INTO leagues(name,maxcap,createdate) VALUES(?,?,?)", (name, cap, datetime.now()))
+        cur.execute("INSERT INTO leagues(lid,name,maxcap,createdate) VALUES(NULL,?,?,?)", (name, cap, datetime.now()))
         con.commit()
         res = cur.execute(f"SELECT * FROM leagues WHERE name='{name}'")
         print(f'Created league {res.fetchone()}')
@@ -43,9 +43,21 @@ def register(name:str, cap:int=16):
         print(f'League {name} already exists, aborting')
     con.close()
 
+def join(lid:str, sid:str):
+    con = sqlite3.connect(config.DB_NAME)
+    cur = con.cursor()
+    res = cur.execute(f"SELECT rowid FROM members WHERE lid='{lid}' AND sid='{sid}'")
+    if res.fetchone() is None:
+        cur.execute('PRAGMA foreign_keys = ON')
+        cur.execute('INSERT INTO members(lid,sid,regdate) VALUES(?,?,?)', (lid, sid, datetime.now()))
+        con.commit()
+        print(f'User {sid} joined league {lid}')
+    else:
+        print(f'User {sid} already joined league {lid}, aborting')
+    con.close()
 
 def __exists(cur:sqlite3.Cursor, name:str):
-    res = cur.execute(f"SELECT id FROM leagues WHERE name='{name}'")
+    res = cur.execute(f"SELECT lid FROM leagues WHERE name='{name}'")
     if res.fetchone() is None:
         return False
     return True

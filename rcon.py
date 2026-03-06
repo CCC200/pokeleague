@@ -1,8 +1,14 @@
 import sys
-from modules import users
+from modules import users, leagues
 
-cmd = sys.argv[1]
-body = sys.argv[2]
-if cmd == '-registeruser':
+args = sys.argv
+args.pop(0)
+if args[0] == '-registeruser':
     users.init()
-    users.register(body)
+    users.register(args[1])
+elif args[0] == '-registerleague':
+    leagues.init()
+    leagues.register(args[1], args[2])
+elif args[0] == '-joinleague':
+    leagues.init()
+    leagues.join(args[1], args[2])
