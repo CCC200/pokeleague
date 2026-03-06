@@ -1,15 +1,17 @@
 import os, json
 
+DB_NAME = 'pokeleague.db'
+BUFFER_SIZE = 1024
+
 # default settings (overriden by settings.json)
-DB_NAME = '_db/pokeleague.db'
 address = '0.0.0.0'
 port = 6500
-buffer = 1024
-max_login = 600
+max_login_time = 600
+max_idle_time = 1800
 
 def init():
-    if os.path.exists('_config/settings.json'):
-        with open('_config/settings.json', 'r') as file:
+    if os.path.exists('settings.json'):
+        with open('settings.json', 'r') as file:
             data = json.loads(file.read())
         if 'address' in data:
             global address
@@ -17,11 +19,19 @@ def init():
         if 'port' in data:
             global port
             port = data['port']
+        if 'max_login_time' in data:
+            global max_login_time
+            max_login_time = data['max_login_time']
+        if 'max_idle_time' in data:
+            global max_idle_time
+            max_idle_time = data['max_idle_time']
     else:
         print('Creating settings.json...')
         settings = {
             'address': address,
             'port': port,
+            'max_login_time': max_login_time,
+            'max_idle_time': max_idle_time,
         }
-        with open('_config/settings.json', 'w') as file:
+        with open('settings.json', 'w') as file:
             file.write(json.dumps(settings, indent=4))
