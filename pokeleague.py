@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, sqlite3
 from modules import users, config, server, leagues
 
 # boot script
@@ -12,6 +12,8 @@ if '-clean' in sys.argv:
             os.remove('settings.json')
 # load modules
 config.init()
-users.init()
-leagues.init()
+con = sqlite3.connect(config.DB_NAME)
+users.init(con)
+leagues.init(con)
+con.close()
 server.init()
