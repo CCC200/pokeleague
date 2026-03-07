@@ -1,16 +1,16 @@
 import sys, sqlite3
-from modules import config, users, leagues
+from modules import config, users, leagues, request
 
 args = sys.argv
 args.pop(0)
 con = sqlite3.connect(config.DB_NAME)
-if args[0] == '-registeruser':
+if args[0] == request.REGISTER_USER:
     users.init(con)
     users.register(args[1], con)
-elif args[0] == '-registerleague':
+elif args[0] == request.REGISTER_LEAGUE:
     leagues.init(con)
     leagues.register(args[1], args[2], con)
-elif args[0] == '-joinleague':
+elif args[0] == request.JOIN_LEAGUE:
     leagues.init(con)
     leagues.join(args[1], args[2], con)
 con.close()

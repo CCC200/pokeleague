@@ -1,6 +1,5 @@
 from sqlite3 import Connection
 from datetime import datetime
-from modules import config
 
 def init(con:Connection):
     res = con.execute("SELECT name FROM sqlite_master WHERE name='leagues'")

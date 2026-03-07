@@ -1,10 +1,18 @@
 from sqlite3 import Connection
 from modules import leagues
 
+# user commands
+REGISTER_USER = 'registeruser'
+
+# league commands
+REGISTER_LEAGUE = 'registerleague'
+GET_LEAGUES = 'getleagues'
+JOIN_LEAGUE = 'joinleague'
+
 def process(user:dict, head:str, body:str, con:Connection):
-    if head == 'getleagues':
+    if head == GET_LEAGUES:
         return leagues.get_for(user['sid'], con)
-    if head == 'joinleague':
+    if head == JOIN_LEAGUE:
         lid, sid = __split(body)
         return leagues.join(lid, sid, con)
     
