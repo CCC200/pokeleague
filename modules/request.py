@@ -11,6 +11,7 @@ ADD_MANAGER = 'addmanager'
 
 # tournament commands
 REGISTER_TOURNAMENT = 'registertournament'
+JOIN_TOURNAMENT = 'jointournament'
 
 def process(user:dict, head:str, body:str, con:Connection):
     if head == GET_LEAGUES:

@@ -16,5 +16,8 @@ elif args[0] == request.ADD_MANAGER:
     leagues.add_manager(args[1], args[2], con)
 elif args[0] == request.REGISTER_TOURNAMENT:
     tournaments.init(con)
-    tournaments.register(args[1], args[2], args[3], datetime.fromisoformat(args[4]), con)
+    tournaments.register(args[1], args[2], args[3], args[4], args[5], args[6], datetime.fromisoformat(args[7]), con)
+elif args[0] == request.JOIN_TOURNAMENT:
+    tournaments.init(con)
+    tournaments.join(args[1], args[2], con)
 con.close()

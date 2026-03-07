@@ -22,7 +22,7 @@ def init(con:Connection):
                     sid varchar(18) NOT NULL,
                     mid_pickup int NOT NULL,
                     mid_drop int,
-                    picktype varchar(5) CHECK(picktype='draft' OR picktype='trade' OR picktype='fa'),
+                    picktype varchar(5) CHECK(picktype='trade' OR picktype='fa'),
                     FOREIGN KEY(sid) REFERENCES users(sid),
                     FOREIGN KEY(mid_pickup) REFERENCES draft_list(mid),
                     FOREIGN KEY(mid_drop) REFERENCES draft_list(mid)
