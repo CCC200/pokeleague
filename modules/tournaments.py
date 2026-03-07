@@ -9,9 +9,9 @@ def init(con:Connection):
                     CREATE TABLE tournaments(
                     tid INTEGER PRIMARY KEY AUTOINCREMENT,
                     lid int NOT NULL,
-                    name varchar(30) NOT NULL,
+                    name varchar(30) NOT NULL UNIQUE,
                     format varchar(30) NOT NULL,
-                    bracket varchar(5) NOT NULL CHECK(bracket='se' OR bracket='de' OR bracket='swiss' OR bracket='rr' OR bracket='rr-se'),
+                    bracket varchar(5) NOT NULL CHECK(bracket='se' OR bracket='de' OR bracket='swiss' OR bracket='rr'),
                     maxcap int NOT NULL,
                     poolsize int NOT NULL,
                     startdate datetime NOT NULL,
@@ -30,24 +30,6 @@ def init(con:Connection):
                     FOREIGN KEY(tid) REFERENCES tournaments(tid),
                     FOREIGN KEY(sid) REFERENCES users(sid),
                     PRIMARY KEY(tid, sid)
-                    )
-                    """)
-    res = con.execute("SELECT name FROM sqlite_master WHERE name='matches'")
-    if res.fetchone() is None:
-        print('Creating matches database...')
-        con.execute("""
-                    CREATE TABLE matches(
-                    matchid INTEGER PRIMARY KEY AUTOINCREMENT,
-                    tid int NOT NULL,
-                    p1 varchar(30) NOT NULL,
-                    p2 varchar(30) NOT NULL,
-                    maxrounds int NOT NULL CHECK(maxrounds >= 1 AND maxrounds <= 5),
-                    score1 int NOT NULL DEFAULT 0 CHECK(score1 >= -1 AND score1 <= 3),
-                    score2 int NOT NULL DEFAULT 0 CHECK(score2 >= -1 AND score2 <= 3),
-                    matchdate datetime,
-                    FOREIGN KEY(tid) REFERENCES tournaments(tid),
-                    FOREIGN KEY(p1) REFERENCES users(name),
-                    FOREIGN KEY(p2) REFERENCES users(name)
                     )
                     """)
         
@@ -70,7 +52,7 @@ def register(lid:str, name:str, format:str, bracket:str, cap:int, poolsize:int, 
 def join(tid:str, sid:str, con:Connection):
     try:
         con.execute('PRAGMA foreign_keys = ON')
-        con.execute(f"INSERT INTO entrants(tid,sid,joindate) VALUES(?,?,?) ", (tid, sid, datetime.now()))
+        con.execute(f"INSERT INTO entrants(tid,sid,joindate) VALUES(?,?,?)", (tid, sid, datetime.now()))
         con.commit()
         print(f'User {sid} joined tournament {tid}')
         return True
