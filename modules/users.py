@@ -1,5 +1,5 @@
 from uuid import uuid4
-from sqlite3 import Connection
+from sqlite3 import Connection, Error
 from datetime import datetime
 
 def init(con:Connection):
@@ -9,7 +9,7 @@ def init(con:Connection):
         con.execute("""
                     CREATE TABLE users(
                     sid varchar(18) PRIMARY KEY,
-                    name varchar(30) NOT NULL,
+                    name varchar(30) NOT NULL UNIQUE,
                     joindate datetime NOT NULL
                     )
                     """)
@@ -23,10 +23,13 @@ def register(name:str, con:Connection):
         sid = __secret()
         res = con.execute(f"SELECT sid FROM users WHERE sid='{sid}'")
         if res.fetchone() is None:
-            con.execute(f"INSERT INTO users VALUES(?,?,?)", (sid, name, datetime.now()))
-            con.commit()
-            res = con.execute(f"SELECT * FROM users WHERE sid='{sid}'")
-            print(f'Created user {res.fetchone()}')
+            try:
+                con.execute(f"INSERT INTO users VALUES(?,?,?)", (sid, name, datetime.now()))
+                con.commit()
+                res = con.execute(f"SELECT * FROM users WHERE sid='{sid}'")
+                print(f'Created user {res.fetchone()}')
+            except Error as e:
+                print(f'User creation error: {e}')
             gen = False
     con.close()
 
@@ -34,7 +37,6 @@ def get(sid:str, con:Connection):
     res = con.execute(f"SELECT * FROM users WHERE sid='{sid}'")
     data = res.fetchone()
     if data is None:
-        print(f"User matching '{sid}' does not exist")
         return
     u = {
         'sid': data[0],

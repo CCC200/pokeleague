@@ -9,6 +9,9 @@ REGISTER_LEAGUE = 'registerleague'
 GET_LEAGUES = 'getleagues'
 JOIN_LEAGUE = 'joinleague'
 
+# tournament commands
+REGISTER_TOURNAMENT = 'registertournament'
+
 def process(user:dict, head:str, body:str, con:Connection):
     if head == GET_LEAGUES:
         return leagues.get_for(user['sid'], con)

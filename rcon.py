@@ -1,5 +1,6 @@
 import sys, sqlite3
-from modules import config, users, leagues, request
+from modules import config, request, users, leagues, tournaments
+from datetime import datetime
 
 args = sys.argv
 args.pop(0)
@@ -9,8 +10,11 @@ if args[0] == request.REGISTER_USER:
     users.register(args[1], con)
 elif args[0] == request.REGISTER_LEAGUE:
     leagues.init(con)
-    leagues.register(args[1], args[2], con)
+    leagues.register(args[1], con)
 elif args[0] == request.JOIN_LEAGUE:
     leagues.init(con)
     leagues.join(args[1], args[2], con)
+elif args[0] == request.REGISTER_TOURNAMENT:
+    tournaments.init(con)
+    tournaments.register(args[1], args[2], args[3], datetime.fromisoformat(args[4]), con)
 con.close()

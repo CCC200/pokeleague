@@ -1,5 +1,5 @@
 import os, sys, sqlite3
-from modules import users, config, server, leagues
+from modules import users, config, server, leagues, tournaments
 
 # boot script
 if '-clean' in sys.argv:
@@ -15,5 +15,6 @@ config.init()
 con = sqlite3.connect(config.DB_NAME)
 users.init(con)
 leagues.init(con)
+tournaments.init(con)
 con.close()
 server.init()

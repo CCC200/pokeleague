@@ -1,4 +1,4 @@
-from sqlite3 import Connection
+from sqlite3 import Connection, Error
 from datetime import datetime
 
 def init(con:Connection):
@@ -8,8 +8,7 @@ def init(con:Connection):
         con.execute("""
                     CREATE TABLE leagues(
                     lid INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name varchar(30) NOT NULL,
-                    maxcap int NOT NULL DEFAULT 16,
+                    name varchar(30) NOT NULL UNIQUE,
                     createdate datetime NOT NULL
                     )
                     """)
@@ -18,7 +17,7 @@ def init(con:Connection):
         print('Creating members database...')
         con.execute("""
                     CREATE TABLE members(
-                    lid int NOT NULL,
+                    lid int PRIMARY KEY NOT NULL,
                     sid varchar(18) NOT NULL,
                     manager boolean NOT NULL DEFAULT FALSE,
                     regdate datetime NOT NULL,
@@ -27,23 +26,30 @@ def init(con:Connection):
                     )
                     """)
 
-def register(name:str, cap:int, con:Connection):
+def register(name:str, con:Connection):
     if not __exists(name, con):
-        con.execute("INSERT INTO leagues(lid,name,maxcap,createdate) VALUES(NULL,?,?,?)", (name, cap, datetime.now()))
-        con.commit()
-        res = con.execute(f"SELECT * FROM leagues WHERE name='{name}'")
-        print(f'Created league {res.fetchone()}')
+        try:
+            con.execute("INSERT INTO leagues(lid,name,createdate) VALUES(NULL,?,?)", (name, datetime.now()))
+            con.commit()
+            res = con.execute(f"SELECT * FROM leagues WHERE name='{name}'")
+            print(f'Created league {res.fetchone()}')
+        except Error as e:
+            print(f'Register league failed: {e}')
     else:
         print(f'League {name} already exists, aborting')
 
 def join(lid:str, sid:str, con:Connection):
     res = con.execute(f"SELECT rowid FROM members WHERE lid='{lid}' AND sid='{sid}'")
     if res.fetchone() is None:
-        con.execute('PRAGMA foreign_keys = ON')
-        con.execute('INSERT INTO members(lid,sid,regdate) VALUES(?,?,?)', (lid, sid, datetime.now()))
-        con.commit()
-        print(f'User {sid} joined league {lid}')
-        return True
+        try:
+            con.execute('PRAGMA foreign_keys = ON')
+            con.execute('INSERT INTO members(lid,sid,regdate) VALUES(?,?,?)', (lid, sid, datetime.now()))
+            con.commit()
+            print(f'User {sid} joined league {lid}')
+            return True
+        except Error as e:
+            print(f'Join league error: {e}')
+            return False
     else:
         print(f'User {sid} already joined league {lid}, aborting')
         return False
