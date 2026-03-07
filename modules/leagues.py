@@ -12,17 +12,15 @@ def init(con:Connection):
                     createdate datetime NOT NULL
                     )
                     """)
-    res = con.execute("SELECT name FROM sqlite_master WHERE name='members'")
+    res = con.execute("SELECT name FROM sqlite_master WHERE name='managers'")
     if res.fetchone() is None:
-        print('Creating members database...')
+        print('Creating managers database...')
         con.execute("""
-                    CREATE TABLE members(
-                    lid int PRIMARY KEY NOT NULL,
+                    CREATE TABLE managers(
+                    lid int NOT NULL,
                     sid varchar(18) NOT NULL,
-                    manager boolean NOT NULL DEFAULT FALSE,
-                    regdate datetime NOT NULL,
-                    FOREIGN KEY(sid) REFERENCES users(sid),
-                    FOREIGN KEY(lid) REFERENCES leagues(lid)
+                    FOREIGN KEY(lid) REFERENCES leagues(lid),
+                    FOREIGN KEY(sid) REFERENCES users(sid)
                     )
                     """)
 
@@ -38,25 +36,19 @@ def register(name:str, con:Connection):
     else:
         print(f'League {name} already exists, aborting')
 
-def join(lid:str, sid:str, con:Connection):
-    res = con.execute(f"SELECT rowid FROM members WHERE lid='{lid}' AND sid='{sid}'")
-    if res.fetchone() is None:
-        try:
-            con.execute('PRAGMA foreign_keys = ON')
-            con.execute('INSERT INTO members(lid,sid,regdate) VALUES(?,?,?)', (lid, sid, datetime.now()))
-            con.commit()
-            print(f'User {sid} joined league {lid}')
-            return True
-        except Error as e:
-            print(f'Join league error: {e}')
-            return False
-    else:
-        print(f'User {sid} already joined league {lid}, aborting')
-        return False
-
 def get_for(sid:str, con:Connection):
-    res = con.execute(f"SELECT l.lid,l.name FROM leagues l LEFT JOIN members m ON m.lid=l.lid WHERE m.sid ='{sid}'")
+    res = con.execute(f"SELECT l.lid,l.name FROM leagues l LEFT JOIN managers m ON m.lid=l.lid WHERE m.sid ='{sid}'")
     return res.fetchall()
+
+def add_manager(lid:str, sid:str, con:Connection):
+    try:
+        con.execute("INSERT INTO managers(lid, sid) VALUES(?,?)", (lid, sid))
+        con.commit()
+        print(f'Added manager {sid} to {lid}')
+        return True
+    except Error as e:
+        print(f'Add manager failed: {e}')
+        return False
 
 def __exists(name:str, con:Connection):
     res = con.execute(f"SELECT lid FROM leagues WHERE name='{name}'")

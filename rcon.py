@@ -11,9 +11,9 @@ if args[0] == request.REGISTER_USER:
 elif args[0] == request.REGISTER_LEAGUE:
     leagues.init(con)
     leagues.register(args[1], con)
-elif args[0] == request.JOIN_LEAGUE:
+elif args[0] == request.ADD_MANAGER:
     leagues.init(con)
-    leagues.join(args[1], args[2], con)
+    leagues.add_manager(args[1], args[2], con)
 elif args[0] == request.REGISTER_TOURNAMENT:
     tournaments.init(con)
     tournaments.register(args[1], args[2], args[3], datetime.fromisoformat(args[4]), con)
