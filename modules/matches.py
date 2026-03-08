@@ -24,8 +24,7 @@ def init(con:Connection):
         print('Creating replays database...')
         con.execute("""
                     CREATE TABLE replays(
-                    replayid INTEGER PRIMARY KEY AUTOINCREMENT,
-                    matchid int NOT NULL,
+                    matchid int PRIMARY KEY,
                     url text NOT NULL,
                     replaytime datetime NOT NULL,
                     FOREIGN KEY(matchid) REFERENCES matches(matchid)
