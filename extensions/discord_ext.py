@@ -17,6 +17,7 @@ class SignupModal(discord.ui.Modal):
             if link_account(interaction.user.id, sid, con):
                 tid = get_channel_tid(interaction.channel_id, con)
                 if tournaments.join(tid, sid, con):
+                    await member_nickname(interaction.user, sid, con)
                     await interaction.response.send_message(embeds=[embed_response('Register', f'{interaction.user.display_name} has joined the tournament!')])
                 else:
                     await interaction.response.send_message('Something went wrong joining the tournament.', ephemeral=True)
@@ -87,6 +88,7 @@ def unlink_channel(channelid:int, userid:int, con:Connection):
         if __check_manager(userid, tid, con):
             try:
                 con.execute(f"DELETE FROM discord_channel WHERE discord_id='{channelid}'")
+                con.commit()
                 return 'Channel unlinked.'
             except Error as e:
                 print(f'Unlink channel error: {e}')
@@ -107,11 +109,18 @@ def embed_response(title, body):
     embed.add_field(name=title, value=body)
     return embed
 
+async def member_nickname(member:discord.Member, sid:str, con:Connection):
+    user = users.get(sid, con)
+    if member.nick != user['name']:
+        try:
+            await member.edit(nick=user['name'])
+        except:
+            print(f'ERROR: Cannot edit "{member.display_name}" discord nickname; perm issue?')
+
 def __check_manager(userid:int, tid:int, con:Connection):
     res = con.execute(f"SELECT d.discord_id FROM discord_auth d LEFT JOIN managers m ON d.sid = m.sid LEFT JOIN tournaments t ON m.lid = t.lid WHERE t.tid='{tid}'")
     mgs = res.fetchall()
     for tup in mgs:
         if int(tup[0]) == userid:
             return True
-    else:
-        return False
+    return False

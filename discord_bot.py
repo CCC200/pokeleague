@@ -23,6 +23,7 @@ async def register(ctx:discord.ApplicationContext):
         await ctx.send_modal(discord_ext.SignupModal(title="League Registration"))
     else:
         if tournaments.join(tid, sid, con):
+            await discord_ext.member_nickname(ctx.author, sid, con)
             await ctx.respond(embed=discord_ext.embed_response('Signup', f'{ctx.author.display_name} has joined the tournament!'))
         else:
             await ctx.respond('Something went wrong joining the tournament.', ephemeral=True)
