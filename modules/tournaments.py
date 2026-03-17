@@ -9,7 +9,7 @@ def init(con:Connection):
                     CREATE TABLE tournaments(
                     tid INTEGER PRIMARY KEY AUTOINCREMENT,
                     lid int NOT NULL,
-                    name varchar(30) NOT NULL UNIQUE,
+                    name varchar(50) NOT NULL UNIQUE,
                     format varchar(30) NOT NULL,
                     bracket varchar(5) NOT NULL CHECK(bracket='se' OR bracket='de' OR bracket='swiss' OR bracket='rr'),
                     maxcap int NOT NULL,

@@ -27,11 +27,12 @@ def register(name:str, con:Connection):
                 con.execute(f"INSERT INTO users VALUES(?,?,?)", (sid, name, datetime.now()))
                 con.commit()
                 res = con.execute(f"SELECT * FROM users WHERE sid='{sid}'")
-                print(f'Created user {res.fetchone()}')
+                user = res.fetchone()
+                print(f'Created user {user}')
+                return user[0]
             except Error as e:
                 print(f'User creation error: {e}')
             gen = False
-    con.close()
 
 def get(sid:str, con:Connection):
     res = con.execute(f"SELECT * FROM users WHERE sid='{sid}'")
