@@ -11,6 +11,7 @@ max_idle_time = 1800
 
 # optional settings (only in settings.json)
 discord_token:str = None
+challonge_key:str = None
 
 def init():
     if os.path.exists('settings.json'):
@@ -31,6 +32,9 @@ def init():
         if 'discord_token' in data:
             global discord_token
             discord_token = data['discord_token']
+        if 'challonge_key' in data:
+            global challonge_key
+            challonge_key = data['challonge_key']
     else:
         print('Creating settings.json...')
         settings = {
