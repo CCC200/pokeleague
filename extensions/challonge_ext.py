@@ -43,7 +43,10 @@ def create_bracket(tid:int, con:Connection):
                 'misc': tup[0]
             })
         res = __post_req(f'/tournaments/{json['data']['id']}/participants/bulk_add.json', body)
-        print(f'Added {len(res.json()['data'])} players to tournament')
+        if res.status_code == 200:
+            print(f'Added {len(res.json()['data'])} players to tournament')
+        else:
+            print(f'Error:\n{res.json()}')
     else:
         print(f'Error:\n{res.json()}')
 
