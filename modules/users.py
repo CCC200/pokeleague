@@ -10,6 +10,7 @@ def init(con:Connection):
                     CREATE TABLE users(
                     sid varchar(18) PRIMARY KEY,
                     name varchar(30) NOT NULL UNIQUE,
+                    pass varchar(15) NOT NULL,
                     joindate datetime NOT NULL
                     )
                     """)
@@ -24,7 +25,7 @@ def register(name:str, con:Connection):
         res = con.execute(f"SELECT sid FROM users WHERE sid='{sid}'")
         if res.fetchone() is None:
             try:
-                con.execute(f"INSERT INTO users VALUES(?,?,?)", (sid, name, datetime.now()))
+                con.execute(f"INSERT INTO users VALUES(?,?,?,?)", (sid, name, __secret(15), datetime.now()))
                 con.commit()
                 res = con.execute(f"SELECT * FROM users WHERE sid='{sid}'")
                 user = res.fetchone()
@@ -42,6 +43,7 @@ def get(sid:str, con:Connection):
     u = {
         'sid': data[0],
         'name': data[1],
+        'pass': data[2],
         'joindate': data[2]
     }
     return u
@@ -52,5 +54,5 @@ def __exists(name:str, con:Connection):
         return False
     return True
 
-def __secret():
-    return str(uuid4()).replace('-', '')[:18]
+def __secret(len:int = 18):
+    return str(uuid4()).replace('-', '')[:len]
