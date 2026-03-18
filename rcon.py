@@ -1,9 +1,11 @@
 import sys, sqlite3
-from modules import config, request, users, leagues, tournaments
 from datetime import datetime
+from modules import config, request, users, leagues, tournaments
+from extensions import challonge_ext
 
 args = sys.argv
 args.pop(0)
+config.init()
 con = sqlite3.connect(config.DB_NAME)
 if args[0] == request.REGISTER_USER:
     users.init(con)
@@ -20,4 +22,8 @@ elif args[0] == request.REGISTER_TOURNAMENT:
 elif args[0] == request.JOIN_TOURNAMENT:
     tournaments.init(con)
     tournaments.join(args[1], args[2], con)
+# challonge extension
+elif args[0] == 'challonge':
+    if args[1] == 'createbracket':
+        challonge_ext.create_bracket(args[2], con)
 con.close()

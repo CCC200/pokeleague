@@ -32,7 +32,15 @@ def init(con:Connection):
                     PRIMARY KEY(tid, sid)
                     )
                     """)
-        
+
+def get(tid:int, con:Connection):
+    res = con.execute(f"SELECT * FROM tournaments WHERE tid='{tid}'")
+    return res.fetchone()
+
+def get_entrants(tid:int, con:Connection):
+    res = con.execute(f"SELECT e.sid, u.name, e.joindate FROM entrants e LEFT JOIN users u ON e.sid=u.sid WHERE e.tid='{tid}'")
+    return res.fetchall()
+      
 def register(lid:str, name:str, format:str, bracket:str, cap:int, poolsize:int, startdate:datetime, con:Connection):
     if not __exists(name, con):
         try:
