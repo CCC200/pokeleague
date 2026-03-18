@@ -26,7 +26,7 @@ def create_bracket(tid:int, con:Connection):
     res = __post_req('/tournaments.json', body)
     if res.status_code == 201:
         json = res.json()
-        print(f'Tourney created at: {json['data']['attributes']['full_challonge_url']}')
+        print(f'Tournament created at: {json['data']['attributes']['full_challonge_url']}')
         entrants = tournaments.get_entrants(tid, con)
         if len(entrants) == 0:
             return
@@ -43,7 +43,7 @@ def create_bracket(tid:int, con:Connection):
                 'misc': tup[0]
             })
         res = __post_req(f'/tournaments/{json['data']['id']}/participants/bulk_add.json', body)
-        print(f'Add players: {res}')
+        print(f'Added {len(res.json()['data'])} players to tournament')
     else:
         print(f'Error:\n{res.json()}')
 
@@ -75,5 +75,5 @@ def __convert_bracket_type(t:str):
         return t
     
 def __flatten_name(n:str):
-    n = n.replace(' ', '_')
+    n = n.replace(' ', '')
     return re.sub(r'[^a-zA-Z0-9]', '', n)
