@@ -24,6 +24,7 @@ elif args[0] == request.JOIN_TOURNAMENT:
     tournaments.join(args[1], args[2], con)
 # challonge extension
 elif args[0] == 'challonge':
+    challonge_ext.init(con)
     if args[1] == 'createbracket':
         challonge_ext.create_bracket(args[2], con)
 con.close()

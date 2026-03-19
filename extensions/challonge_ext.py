@@ -4,6 +4,19 @@ from modules import config, tournaments
 
 BASE_URL = 'https://api.challonge.com/v2.1'
 
+def init(con:Connection):
+    res = con.execute("SELECT name FROM sqlite_master WHERE name='challonge_tournament'")
+    if res.fetchone() is None:
+        print('Creating challonge database...')
+        con.execute("""
+                    CREATE TABLE challonge_tournament(
+                    challonge_id text NOT NULL,
+                    tid int NOT NULL,
+                    FOREIGN KEY(tid) REFERENCES tournaments(tid),
+                    PRIMARY KEY(challonge_id, tid)
+                    )
+                    """)
+
 def verify_key():
     print(f'Challonge API login: {__get_req('/me.json')}')
 
