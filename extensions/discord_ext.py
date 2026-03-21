@@ -44,7 +44,7 @@ def init(con:Connection):
                     CREATE TABLE discord_channel(
                     discord_id varchar(20) NOT NULL,
                     tid int NOT NULL,
-                    register boolean NOT NULL DEFAULT true,
+                    active boolean NOT NULL DEFAULT true,
                     FOREIGN KEY(tid) REFERENCES tournaments(tid),
                     PRIMARY KEY(discord_id, tid)
                     )
@@ -84,12 +84,12 @@ def link_channel(channelid:int, userid:int, tid:int, con:Connection):
         return ERROR_NOT_MANAGER
     
 def close_channel(channelid:int, userid:int, con:Connection):
-    """Closes signups on an open tournament channel"""
+    """Closes connection to a tournament channel"""
     tid = get_channel_tid(channelid, con)
     if tid is not None:
         if __check_manager(userid, tid, con):
             try:
-                con.execute(f"UPDATE discord_channel SET register=false WHERE discord_id='{channelid}'")
+                con.execute(f"UPDATE discord_channel SET active=false WHERE discord_id='{channelid}'")
                 con.commit()
                 return 'Tournament registration closed.'
             except Error as e:
@@ -99,7 +99,7 @@ def close_channel(channelid:int, userid:int, con:Connection):
             return ERROR_NOT_MANAGER
         
 def get_channel_tid(channelid:int, con:Connection):
-    res = con.execute(f"SELECT tid FROM discord_channel WHERE discord_id='{channelid}'")
+    res = con.execute(f"SELECT tid FROM discord_channel WHERE discord_id='{channelid} AND active=true'")
     tid = res.fetchone()
     if tid:
         return tid[0]
