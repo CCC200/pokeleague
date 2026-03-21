@@ -59,11 +59,16 @@ def register(lid:str, name:str, format:str, bracket:str, cap:int, poolsize:int, 
     
 def join(tid:str, sid:str, con:Connection):
     try:
-        con.execute('PRAGMA foreign_keys = ON')
-        con.execute(f"INSERT INTO entrants(tid,sid,joindate) VALUES(?,?,?)", (tid, sid, datetime.now()))
-        con.commit()
-        print(f'User {sid} joined tournament {tid}')
-        return True
+        res = con.execute(f"SELECT t.maxcap, COUNT(e.tid), t.startdate FROM tournaments t LEFT JOIN entrants e ON t.tid=e.tid WHERE t.tid={tid}")
+        entrantdata = res.fetchone()
+        if entrantdata and entrantdata[1] < entrantdata[0] and datetime.now() < datetime.fromisoformat(entrantdata[2]):
+            con.execute('PRAGMA foreign_keys = ON')
+            con.execute(f"INSERT INTO entrants(tid,sid,joindate) VALUES(?,?,?)", (tid, sid, datetime.now()))
+            con.commit()
+            print(f'User {sid} joined tournament {tid}')
+            return True
+        else:
+            return False
     except Error as e:
         print(f'Join tournament error: {e}')
         return False
