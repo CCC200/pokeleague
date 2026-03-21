@@ -45,6 +45,7 @@ def init(con:Connection):
                     discord_id varchar(20) NOT NULL,
                     tid int NOT NULL,
                     active boolean NOT NULL DEFAULT true,
+                    role_id varchar(20),
                     FOREIGN KEY(tid) REFERENCES tournaments(tid),
                     PRIMARY KEY(discord_id, tid)
                     )
@@ -70,11 +71,14 @@ def link_account(userid:int, sid:str, con:Connection):
         print(f'Register discord failed: {e}')
         return False
 
-def link_channel(channelid:int, userid:int, tid:int, con:Connection):
+def link_channel(channelid:int, userid:int, tid:int, con:Connection, roleid:str = None):
     """Associate a discord channel with a tournament (opens signups)"""
     if __check_manager(userid, tid, con):
         try:
-            con.execute("INSERT INTO discord_channel(discord_id, tid) VALUES(?,?)", (channelid, tid))
+            if roleid:
+                con.execute("INSERT INTO discord_channel(discord_id, tid, role_id) VALUES(?,?,?)", (channelid, tid, roleid))
+            else:
+                con.execute("INSERT INTO discord_channel(discord_id, tid) VALUES(?,?)", (channelid, tid))
             con.commit()
             return 'Tournament linked to channel.'
         except Error as e:
@@ -99,10 +103,18 @@ def close_channel(channelid:int, userid:int, con:Connection):
             return ERROR_NOT_MANAGER
         
 def get_channel_tid(channelid:int, con:Connection):
-    res = con.execute(f"SELECT tid FROM discord_channel WHERE discord_id='{channelid} AND active=true'")
+    res = con.execute(f"SELECT tid FROM discord_channel WHERE discord_id='{channelid}' AND active=true")
     tid = res.fetchone()
     if tid:
         return tid[0]
+    else:
+        return None
+    
+def get_channel_role(channelid:int, con:Connection):
+    res = con.execute(f"SELECT role_id FROM discord_channel WHERE discord_id='{channelid}'")
+    roleid = res.fetchone()
+    if roleid:
+        return roleid[0]
     else:
         return None
 

@@ -18,6 +18,11 @@ async def register(ctx:discord.ApplicationContext):
         await ctx.respond('There is no tournament with registration available.', ephemeral=True)
         con.close()
         return
+    roleid = discord_ext.get_channel_role(ctx.channel_id, con)
+    if not ctx.author.get_role(int(roleid)):
+        await ctx.respond('You do not have the required role for this tournament.', ephemeral=True)
+        con.close()
+        return
     sid = discord_ext.get_account(ctx.author.id, con)
     if sid is None:
         await ctx.send_modal(discord_ext.SignupModal(title="League Registration"))
@@ -33,9 +38,10 @@ manager = bot.create_group('manager', 'Manager commands')
 
 @manager.command(name='open-tournament', description='Assigns tournament registration to this channel')
 @discord.option('tourid', type=discord.SlashCommandOptionType.integer)
-async def open_tournament(ctx:discord.ApplicationContext, tourid:int):
+@discord.option('roleid', type=discord.SlashCommandOptionType.string, required=False)
+async def open_tournament(ctx:discord.ApplicationContext, tourid:int, roleid:str = None):
     con = sqlite3.connect(config.DB_NAME)
-    res = discord_ext.link_channel(ctx.channel_id, ctx.author.id, tourid, con)
+    res = discord_ext.link_channel(ctx.channel_id, ctx.author.id, tourid, con, roleid)
     await ctx.respond(res, ephemeral=True)
     con.close()
 

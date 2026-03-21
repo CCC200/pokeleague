@@ -1,7 +1,7 @@
 import sys, sqlite3
 from datetime import datetime
 from modules import config, request, users, leagues, tournaments
-from extensions import challonge_ext
+from extensions import challonge_ext, discord_ext
 
 args = sys.argv
 args.pop(0)
@@ -27,4 +27,9 @@ elif args[0] == 'challonge':
     challonge_ext.init(con)
     if args[1] == 'createbracket':
         challonge_ext.create_bracket(args[2], con)
+# discord extension
+elif args[0] == 'discord':
+    discord_ext.init(con)
+    if args[1] == 'linkaccount':
+        discord_ext.link_account(args[2], args[3], con)
 con.close()
