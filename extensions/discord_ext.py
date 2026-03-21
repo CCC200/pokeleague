@@ -33,7 +33,7 @@ def init(con:Connection):
         con.execute("""
                     CREATE TABLE discord_auth(
                     discord_id varchar(20) PRIMARY KEY,
-                    sid varchar(18) NOT NULL UNIQUE,
+                    sid varchar(18) NOT NULL,
                     FOREIGN KEY(sid) REFERENCES users(sid)
                     )
                     """)
@@ -42,9 +42,11 @@ def init(con:Connection):
         print('Creating discord_channel database...')
         con.execute("""
                     CREATE TABLE discord_channel(
-                    discord_id varchar(20) PRIMARY KEY,
+                    discord_id varchar(20) NOT NULL,
                     tid int NOT NULL,
-                    FOREIGN KEY(tid) REFERENCES tournaments(tid)
+                    register boolean NOT NULL DEFAULT true,
+                    FOREIGN KEY(tid) REFERENCES tournaments(tid),
+                    PRIMARY KEY(discord_id, tid)
                     )
                     """)
         
@@ -81,15 +83,15 @@ def link_channel(channelid:int, userid:int, tid:int, con:Connection):
     else:
         return ERROR_NOT_MANAGER
     
-def unlink_channel(channelid:int, userid:int, con:Connection):
-    """Removes a tournament association from a channel (closes signups)"""
+def close_channel(channelid:int, userid:int, con:Connection):
+    """Closes signups on an open tournament channel"""
     tid = get_channel_tid(channelid, con)
     if tid is not None:
         if __check_manager(userid, tid, con):
             try:
-                con.execute(f"DELETE FROM discord_channel WHERE discord_id='{channelid}'")
+                con.execute(f"UPDATE discord_channel SET register=false WHERE discord_id='{channelid}'")
                 con.commit()
-                return 'Channel unlinked.'
+                return 'Tournament registration closed.'
             except Error as e:
                 print(f'Unlink channel error: {e}')
                 return 'Failed to unlink channel.'

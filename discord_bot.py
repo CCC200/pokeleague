@@ -42,7 +42,7 @@ async def open_tournament(ctx:discord.ApplicationContext, tourid:int):
 @manager.command(name='close-tournament', description='Removes tournament registration from this channel.')
 async def close_tournament(ctx:discord.ApplicationContext):
     con = sqlite3.connect(config.DB_NAME)
-    res = discord_ext.unlink_channel(ctx.channel_id, ctx.author.id, con)
+    res = discord_ext.close_channel(ctx.channel_id, ctx.author.id, con)
     await ctx.respond(res, ephemeral=True)
     con.close()
 
