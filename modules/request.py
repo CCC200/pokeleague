@@ -1,7 +1,8 @@
 from sqlite3 import Connection
-from modules import leagues
+from modules import leagues, users
 
 # user commands
+LOGIN = 'login'
 REGISTER_USER = 'registeruser'
 
 # league commands
@@ -16,6 +17,11 @@ JOIN_TOURNAMENT = 'jointournament'
 def process(user:dict, head:str, body:str, con:Connection):
     if head == GET_LEAGUES:
         return leagues.get_for(user['sid'], con)
+    
+def process_login(head:str, body:str, con:Connection):
+    if head == LOGIN:
+        name, pwd = __split(body)
+        return users.get_credential(name, pwd, con)
     
 def __split(body:str):
     s = body.split(',')

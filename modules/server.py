@@ -1,5 +1,5 @@
 import socket, asyncio, sqlite3
-from modules import config, users, request
+from modules import config, request
 
 def init():
     asyncio.run(__start())
@@ -40,19 +40,16 @@ async def __login_thread(client:socket.socket, ip):
 
 async def __handle_login(client:socket.socket, con:sqlite3.Connection):
     events = asyncio.get_event_loop()
-    await events.sock_sendall(client, __encode('login', 'wait'))
+    await events.sock_sendall(client, __encode(request.LOGIN, 'wait'))
     while True:
         req = await events.sock_recv(client, config.BUFFER_SIZE)
         head, body = __decode(req)
-        if head == 'login':
-            user = users.get(body, con)
-            if user is not None:
-                await events.sock_sendall(client, __encode('login', f'{user['name']},{user['joindate']}'))
-                return user
-            else:
-                await events.sock_sendall(client, __encode('error', 'badSID'))
+        user = request.process_login(head, body, con)
+        if user is not None:
+            await events.sock_sendall(client, __encode(request.LOGIN, f'{user['name']},{user['joindate']}'))
+            return user
         else:
-            await events.sock_sendall(client, __encode('error', 'nologin'))
+            await events.sock_sendall(client, __encode('error', 'badlogin'))
 
 async def __request_thread(client:socket.socket, user:dict, con:sqlite3.Connection):
     events = asyncio.get_event_loop()

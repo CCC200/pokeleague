@@ -38,15 +38,24 @@ def register(name:str, con:Connection):
 def get(sid:str, con:Connection):
     res = con.execute(f"SELECT * FROM users WHERE sid='{sid}'")
     data = res.fetchone()
-    if data is None:
-        return
-    u = {
-        'sid': data[0],
-        'name': data[1],
-        'pass': data[2],
-        'joindate': data[2]
-    }
-    return u
+    if data:
+        return {
+            'sid': data[0],
+            'name': data[1],
+            'pass': data[2],
+            'joindate': data[3]
+        }
+
+def get_credential(name:str, pwd:str, con:Connection):
+    res = con.execute(f"SELECT * FROM users WHERE name='{name}' AND pass='{pwd}'")
+    data = res.fetchone()
+    if data:
+        return {
+            'sid': data[0],
+            'name': data[1],
+            'pass': data[2],
+            'joindate': data[3]
+        }
 
 def __exists(name:str, con:Connection):
     res = con.execute(f"SELECT sid FROM users WHERE name='{name}'")
