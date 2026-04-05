@@ -10,7 +10,7 @@ def init(con:Connection):
                     CREATE TABLE users(
                     sid varchar(18) PRIMARY KEY,
                     name varchar(30) NOT NULL UNIQUE,
-                    pass varchar(15) NOT NULL,
+                    pass TEXT,
                     joindate datetime NOT NULL
                     )
                     """)
@@ -25,7 +25,7 @@ def register(name:str, con:Connection):
         res = con.execute(f"SELECT sid FROM users WHERE sid='{sid}'")
         if res.fetchone() is None:
             try:
-                con.execute(f"INSERT INTO users VALUES(?,?,?,?)", (sid, name, __secret(15), datetime.now()))
+                con.execute(f"INSERT INTO users(sid,name,joindate) VALUES(?,?,?)", (sid, name, datetime.now()))
                 con.commit()
                 res = con.execute(f"SELECT * FROM users WHERE sid='{sid}'")
                 user = res.fetchone()
