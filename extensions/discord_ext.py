@@ -18,7 +18,7 @@ class SignupModal(discord.ui.Modal):
                 tid = get_channel_tid(interaction.channel_id, con)
                 if tournaments.join(tid, sid, con):
                     await member_nickname(interaction.user, sid, con)
-                    await interaction.response.send_message(embeds=[embed_response('Register', f'{interaction.user.nick if interaction.user.nick else interaction.user.display_name} has joined the tournament!')])
+                    await interaction.response.send_message(embeds=[embed_response('Register', f'{username} has joined the tournament!')])
                 else:
                     await interaction.response.send_message('Something went wrong joining the tournament.', ephemeral=True)
             else:
@@ -130,6 +130,7 @@ async def member_nickname(member:discord.Member, sid:str, con:Connection):
             await member.edit(nick=user['name'])
         except:
             print(f'ERROR: Cannot edit "{member.display_name}" discord nickname; perm issue?')
+    return user['name']
 
 def __check_manager(userid:int, tid:int, con:Connection):
     res = con.execute(f"SELECT d.discord_id FROM discord_auth d LEFT JOIN managers m ON d.sid = m.sid LEFT JOIN tournaments t ON m.lid = t.lid WHERE t.tid='{tid}'")
