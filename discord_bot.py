@@ -29,7 +29,7 @@ async def register(ctx:discord.ApplicationContext):
     else:
         if tournaments.join(tid, sid, con):
             await discord_ext.member_nickname(ctx.author, sid, con)
-            await ctx.respond(embed=discord_ext.embed_response('Register', f'{ctx.author.nick} has joined the tournament!'))
+            await ctx.respond(embed=discord_ext.embed_response('Register', f'{ctx.author.nick if ctx.author.nick else ctx.author.display_name} has joined the tournament!'))
         else:
             await ctx.respond('Something went wrong joining the tournament.', ephemeral=True)
     con.close()
