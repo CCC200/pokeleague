@@ -19,7 +19,7 @@ async def register(ctx:discord.ApplicationContext):
         con.close()
         return
     roleid = discord_ext.get_channel_role(ctx.channel_id, con)
-    if not ctx.author.get_role(int(roleid)):
+    if roleid and not ctx.author.get_role(int(roleid)):
         await ctx.respond('You do not have the required role for this tournament.', ephemeral=True)
         con.close()
         return
