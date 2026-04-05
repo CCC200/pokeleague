@@ -18,7 +18,7 @@ class SignupModal(discord.ui.Modal):
                 tid = get_channel_tid(interaction.channel_id, con)
                 if tournaments.join(tid, sid, con):
                     await member_nickname(interaction.user, sid, con)
-                    await interaction.response.send_message(embeds=[embed_response('Register', f'{interaction.user.display_name} has joined the tournament!')])
+                    await interaction.response.send_message(embeds=[embed_response('Register', f'{interaction.user.nick} has joined the tournament!')])
                 else:
                     await interaction.response.send_message('Something went wrong joining the tournament.', ephemeral=True)
             else:
