@@ -1,8 +1,6 @@
 # PokeLeague
 ### A tool for hosting & participating in competitive Pokemon tournaments.
 
-**Server** | Client (coming soon)
-
 <p align="center">
     <img src="icon.png">
 </p>
@@ -22,25 +20,6 @@ PokeLeague is a Python + SQLite backend for running competitive Pokemon leagues.
 # Components
 This project is made up of several components, some of which are optional if the setup does not warrant them.
 
-## Server
-The core server listens for socket connections, handles user login and can parse/reply to "requests" made by users. Ideally interacts with a frontend client the host provides.
-
-### Setup
-
-```
-pip install requests
-python3 pokeleague.py
-```
-
-Close the connection with **Ctrl+C**.
-
-### Configuration
-After the initial launch, several settings can be configured in `settings.json`:
-- `address`: default `0.0.0.0` (this probably should not be changed)
-- `port`: default `6500`
-- `max_login_time`: default `600` (10 minutes)
-- `max_idle_time`: default `1800` (30 minutes)
-
 ## Discord Bot
 A discord bot can be deployed in league servers. This allows hosts to tie tournament registration to channels, with single-command onboarding for participants.
 
@@ -58,7 +37,7 @@ Add the bot token to `settings.json` as follows:
 ```
 
 ## RCON
-A simple CLI app to directly interact with the database. Useful for admins or minimal setups that might not need the [Server](#server) component.
+A simple CLI app to directly interact with the database. Useful for admins or minimal configurations.
 
 ### Setup
 
